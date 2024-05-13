@@ -9,7 +9,7 @@ public class Main {
         root.left.right = new TreeNode(3);
         root.right.right = new TreeNode(9);
         root.right.left = new TreeNode(6);
-        levelOrderUsingHashMap(root);
+        System.out.println(search(root, 4));
     }
 
 
@@ -160,12 +160,12 @@ public class Main {
     }
 
     static void levelOrderUsingHashMap(TreeNode root) {
-        if(root == null) return;
+        if (root == null) return;
         HashMap<Integer, List<Integer>> levelMap = new HashMap<>();
         Queue<NodeLevelPair> queue = new LinkedList<>();
         queue.offer(new NodeLevelPair(root, 0));
 
-        while(!queue.isEmpty()) {
+        while (!queue.isEmpty()) {
             NodeLevelPair currentPair = queue.poll();
             TreeNode currentNode = currentPair.node;
             int currentLevel = currentPair.level;
@@ -181,12 +181,90 @@ public class Main {
             }
         }
 
-        for(int level = 0; levelMap.containsKey(level); level++) {
+        for (int level = 0; levelMap.containsKey(level); level++) {
             List<Integer> nodes = levelMap.get(level);
-            for(int val: nodes) {
-                System.out.print(val+" ");
+            for (int val : nodes) {
+                System.out.print(val + " ");
             }
             System.out.println();
         }
     }
-}
+
+    // insert node in BST
+    static TreeNode insert(TreeNode root, int k) {
+        if (root == null) {
+            return new TreeNode(k);
+        }
+        if (k < root.val) {
+            root.left = insert(root.left, k);
+        } else if (k > root.val) {
+            root.right = insert(root.right, k);
+        }
+        return root;
+    }
+
+    // check for balanced binary search tree
+
+    static int checkBBST(TreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+
+        int leftHeight = checkBBST(root.left);
+        if (leftHeight == -1) return -1;
+
+        int rightHeight = checkBBST(root.right);
+        if (rightHeight == -1) return -1;
+
+        if (Math.abs(leftHeight - rightHeight) > 1) {
+            return -1;
+        }
+
+        return 1 + Math.max(leftHeight, rightHeight);
+    }
+
+    static boolean isBalanced(TreeNode root) {
+        return checkBBST(root) != -1;
+    }
+
+    // search for a node in BST
+    static boolean search(TreeNode root, int k) {
+        if (root == null) return false;
+        if (k > root.val) {
+            return search(root.right, k);
+        } else if (k < root.val) {
+            return search(root.left, k);
+        } else {
+            return true;
+        }
+    }
+
+    static int findMax(TreeNode root) {
+        if(root == null) return Integer.MIN_VALUE;
+        return Math.max(root.val, Math.max(findMax(root.left), findMax(root.right)));
+    }
+
+    // deletion
+    static TreeNode delete(TreeNode root, int k) {
+        if(root == null) return null;
+        if (k > root.val) {
+            root.right = delete(root.right, k);
+        } else if (k < root.val) {
+            root.left = delete(root.left, k);
+        } else {
+            if(root.left == null && root.right == null) {
+                return null;
+            }
+            if(root.left == null) {
+                return root.right;
+            }
+            if(root.right == null) {
+                return root.left;
+            }
+            root.val = findMax(root.left);
+            root.left = delete(root.left, root.val);
+        }
+        return root;
+    }
+
+    }
